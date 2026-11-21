@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#102e26">
+<title>Your Christmas secret · Secret Santa</title>
+<link rel="stylesheet" href="christmas.css"><link rel="stylesheet" href="animals/reveal.css">
+<script src="/branding.js" defer></script></head><body>
+<canvas id="winter" aria-hidden="true"></canvas>
+<header class="topbar"><div class="brand"><span aria-hidden="true">✳</span> SECRET SANTA</div><span class="edition">CHRISTMAS GIFT EXCHANGE</span></header>
+<main><div class="star" aria-hidden="true">✧</div><p class="eyebrow">A little Christmas magic</p><h1>Secret<em>Santa</em></h1>
+<div class="card reveal-card"><h2>A little secret, just for you.</h2><p class="card-copy">Someone is waiting in the trees</p>
+<div class="reveal-stage">
+<div class="recipient" hidden><span class="recipient-star" aria-hidden="true">✧</span><p class="eyebrow">You’re Secret Santa for</p><h3 id="recipient-name"></h3><p class="recipient-note">Gift limit: £0-£20</p></div>
+<div class="forest-fallback" aria-hidden="true"><span>🎄</span><span>🎄</span></div><canvas id="reveal-forest" aria-hidden="true"></canvas><p class="forest-caption">A Christmas secret awaits…</p>
+</div>
+<button id="reveal" class="primary" type="button">Reveal my name <span aria-hidden="true">✧</span></button><p class="note">Keep it between you and Santa.</p><p id="reveal-status" class="sr-only" role="status" aria-live="polite"></p></div>
+<footer class="footer">Wrapped in love. Signed, Santa.</footer></main>
+<div class="animal-crossing" aria-hidden="true"><div class="walker cat-walker"><img class="cat" src="animals/cat-frame-0.png" alt=""></div><div class="walker dog-walker"><img class="dog" src="animals/dog-frame-0.png" alt=""></div></div>
+<button id="motion" class="motion" hidden type="button">Pause snowfall</button>
+<script src="animals/reveal.js"></script><script type="module" src="winter.js"></script>
+</body></html>

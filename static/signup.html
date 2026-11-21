@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#102e26"><title>Secret Santa</title><link rel="stylesheet" href="/christmas.css">
+<meta name="description" content="Join the Christmas gift exchange. Sign up and confirm your email to take part.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Secret Santa 🎄">
+<meta property="og:description" content="Join the Christmas gift exchange. Sign up and confirm your email to take part.">
+<meta property="og:site_name" content="Secret Santa">
+<meta property="og:locale" content="en_GB">
+<meta property="og:image" content="https://santa.example.com/christmas-preview.png">
+<meta property="og:image:secure_url" content="https://santa.example.com/christmas-preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Secret Santa in gold and cream lettering, with Christmas trees and falling snow on a deep green background.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Secret Santa 🎄">
+<meta name="twitter:description" content="Join the Christmas gift exchange. Sign up and confirm your email to take part.">
+<meta name="twitter:image" content="https://santa.example.com/christmas-preview.png">
+<script src="/branding.js" defer></script></head><body>
+<canvas id="winter" aria-hidden="true"></canvas><header class="topbar"><div class="brand"><span aria-hidden="true">✳</span> SECRET SANTA</div><span class="edition">CHRISTMAS GIFT EXCHANGE</span></header>
+<main><div class="star" aria-hidden="true">✧</div><p class="eyebrow">A little Christmas magic</p><h1>Secret<em>Santa</em></h1><div class="card"><h2 id="signup-heading">A little mystery. A lot of joy.</h2><p class="card-copy">Pop your name on the list. We’ll email you a link to confirm you’re joining the fun.</p><form id="signup" hidden><label for="name">Your name</label><input id="name" name="name" required maxlength="100" autocomplete="name" placeholder="The name your Secret Santa will see"><label for="email">Email address</label><input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"><button class="primary" type="submit">Count me in <span aria-hidden="true">→</span></button></form><p class="note" id="signup-note" hidden>One small signup. A lovely little Christmas secret.</p><div id="message" class="status" role="status" aria-live="polite"></div></div><p id="participant-count" class="participants" role="status"></p><footer class="footer">Wrapped in love. Signed, Santa.</footer></main><button id="motion" class="motion" hidden type="button">Pause snowfall</button>
+<script>
+const message = document.querySelector('#message');
+const token = new URLSearchParams(location.search).get('token');
+const query = '?token=' + encodeURIComponent(token || '');
+function setRegistrationClosed(closed) {
+  document.querySelector('#signup').hidden = closed;
+  document.querySelector('#signup-note').hidden = closed;
+  document.querySelector('#signup-heading').textContent = closed ? 'Registration is closed' : 'A little mystery. A lot of joy.';
+  document.querySelector('.card-copy').textContent = closed ? 'The list is wrapped up. Wishing you a lovely Christmas.' : 'Pop your name on the list. We’ll email you a link to confirm you’re joining the fun.';
+}
+async function loadCount() {
+  try {
+    const response = await fetch('/api/participants/count' + query);
+    if (response.ok) {
+      const {confirmed_count: count, registration_closed: closed} = await response.json();
+      setRegistrationClosed(closed);
+      document.querySelector('#participant-count').textContent = `${count} ${count === 1 ? 'person has' : 'people have'} confirmed their signup.`;
+    } else { throw new Error(); }
+  } catch { message.dataset.kind = 'error'; message.textContent = 'Could not load registration. Please refresh to try again.'; }
+}
+loadCount();
+document.querySelector('#signup').onsubmit = async event => {
+  event.preventDefault();
+  const button = event.target.querySelector('button');
+  button.disabled = true; button.textContent = 'Sending your invitation…';
+  try {
+    const response = await fetch('/api/register' + query, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(new FormData(event.target)))});
+    const data = await response.json();
+    if (!response.ok && data.error === 'Registration is closed') setRegistrationClosed(true);
+    message.dataset.kind = response.ok ? 'success' : 'error';
+    message.textContent = response.ok ? 'You’re nearly in! Check your inbox for a confirmation link. Don’t forget your spam folder.' : data.error;
+  } catch { message.dataset.kind = 'error'; message.textContent = 'Could not connect. Please try again.'; }
+  finally { button.disabled = false; button.textContent = 'Count me in  →'; }
+};
+</script>
+<script type="module" src="/winter.js"></script></body></html>

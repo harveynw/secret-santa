@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#102e26"><title>Secret Santa</title><link rel="stylesheet" href="/christmas.css"><script src="/branding.js" defer></script></head><body>
+<canvas id="winter" aria-hidden="true"></canvas><header class="topbar"><div class="brand"><span aria-hidden="true">✳</span> SECRET SANTA</div><span class="edition">CHRISTMAS GIFT EXCHANGE</span></header>
+<main><div class="star" aria-hidden="true">✧</div><p class="eyebrow">A little Christmas magic</p><h1>Secret<em>Santa</em></h1><div class="card confirm-card"><div class="seal" aria-hidden="true">✉</div><h2 id="card-title">Make it Christmas official.</h2><p class="card-copy">One last little step. Confirm your email below to join the Secret Santa gift exchange.</p><button id="verify" class="primary">Confirm my registration <span aria-hidden="true">→</span></button><div id="message" class="status" role="status" aria-live="polite"></div><p id="participant-count" class="card-copy"></p><section id="confirmed" hidden><h2>Look who’s joining the fun</h2><ul id="confirmed-names"></ul></section></div><footer class="footer">Wrapped in love. Signed, Santa.</footer></main><button id="motion" class="motion" hidden type="button">Pause snowfall</button>
+<script>
+const token = new URLSearchParams(location.search).get('token');
+const message = document.querySelector('#message');
+const button = document.querySelector('#verify');
+// The token stays in memory for retries; avoid leaving it in the address bar.
+history.replaceState(null, '', location.pathname);
+if (!token) {
+  button.hidden = true;
+  message.textContent = 'Please open the confirmation link in your email.';
+}
+button.onclick = async () => {
+  button.disabled = true; button.textContent = 'Confirming…';
+  try {
+    const response = await fetch('/api/verify', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({token})});
+    const data = await response.json();
+    if (!response.ok) { message.dataset.kind = 'error'; message.textContent = data.error; return; }
+    message.dataset.kind = 'success'; document.querySelector('#card-title').textContent = 'You’re on the nice list!'; document.querySelector('.seal').textContent = '✓'; document.querySelector('.card-copy').hidden = true;
+    message.textContent = 'Registration confirmed! No need to do anything else.';
+    button.hidden = true;
+    const count = data.confirmed_count;
+    document.querySelector('#participant-count').textContent = `${count} ${count === 1 ? 'person has' : 'people have'} confirmed their signup.`;
+    document.querySelector('#confirmed-names').replaceChildren(...data.confirmed_names.map(name => {
+      const item = document.createElement('li');
+      item.textContent = name;
+      return item;
+    }));
+    document.querySelector('#confirmed').hidden = false;
+  } catch { message.dataset.kind = 'error'; message.textContent = 'Could not connect. Please try again.'; }
+  finally { button.disabled = false; button.textContent = 'Confirm my registration  →'; }
+};
+</script>
+<script type="module" src="/winter.js"></script></body></html>

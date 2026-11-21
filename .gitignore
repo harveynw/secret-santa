@@ -1,0 +1,12 @@
+/target/
+/data/
+.env
+.env.*
+!.env.example
+
+.DS_Store
+/selection*.json
+/selection*.new
+/selection*.tmp
+/selection*.lock
+/deploy/
